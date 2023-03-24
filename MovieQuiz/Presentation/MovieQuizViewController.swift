@@ -3,7 +3,7 @@ import Dispatch
 
 final class MovieQuizViewController: UIViewController {
     
-    struct QuizQuestion {
+    private struct QuizQuestion {
       // строка с названием фильма,
       // совпадает с названием картинки афиши фильма в Assets
       let image: String
@@ -14,7 +14,7 @@ final class MovieQuizViewController: UIViewController {
     }
 
     // вью модель для состояния "Вопрос показан"
-    struct QuizStepViewModel {
+    private struct QuizStepViewModel {
       // картинка с афишей фильма с типом UIImage
       let image: UIImage
       // вопрос о рейтинге квиза
@@ -23,7 +23,7 @@ final class MovieQuizViewController: UIViewController {
       let questionNumber: String
     }
 
-    struct QuizResultsViewModel {
+    private struct QuizResultsViewModel {
       // строка с заголовком алерта
       let title: String
       // строка с текстом о количестве набранных очков
