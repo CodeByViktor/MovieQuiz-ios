@@ -1,110 +1,76 @@
 import UIKit
 import Dispatch
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
-    private struct QuizQuestion {
-      // строка с названием фильма,
-      // совпадает с названием картинки афиши фильма в Assets
-      let image: String
-      // строка с вопросом о рейтинге фильма
-      let text: String = "Рейтинг этого фильма больше чем 6?"
-      // булевое значение (true, false), правильный ответ на вопрос
-      let correctAnswer: Bool
-    }
-
-    // вью модель для состояния "Вопрос показан"
-    private struct QuizStepViewModel {
-      // картинка с афишей фильма с типом UIImage
-      let image: UIImage
-      // вопрос о рейтинге квиза
-      let question: String
-      // строка с порядковым номером этого вопроса (ex. "1/10")
-      let questionNumber: String
-    }
-
-    private struct QuizResultsViewModel {
-      // строка с заголовком алерта
-      let title: String
-      // строка с текстом о количестве набранных очков
-      let text: String
-      // текст для кнопки алерта
-      let buttonText: String
-    }
+    // MARK: Properties
+    let notificationGenerator = UINotificationFeedbackGenerator()
+    // переменная с индексом текущего вопроса, начальное значение 0
+    // (по этому индексу будем искать вопрос в массиве, где индекс первого элемента 0, а не 1)
+    private var currentQuestionIndex = 0
+    private let questionsAmount: Int = 10
+    private var questionFactory: QuestionFactoryProtocol?
+    private var currentQuestion: QuizQuestion?
+    private var alertPresenter: AlertPresenter?
+    private var statisticService: StatisticService?
+    // переменная со счётчиком правильных ответов, начальное значение закономерно 0
+    private var correctAnswers = 0
     
     @IBOutlet weak private var imageView: UIImageView!
     @IBOutlet weak private var textLabel: UILabel!
     @IBOutlet weak private var counterLabel: UILabel!
     
-    let notificationGenerator = UINotificationFeedbackGenerator()
-    // переменная с индексом текущего вопроса, начальное значение 0
-    // (по этому индексу будем искать вопрос в массиве, где индекс первого элемента 0, а не 1)
-    private var currentQuestionIndex = 0
-    // переменная со счётчиком правильных ответов, начальное значение закономерно 0
-    private var correctAnswers = 0
-    
-    // массив вопросов
-    private let questions: [QuizQuestion] = [
-        QuizQuestion(
-            image: "The Godfather",
-            correctAnswer: true
-        ),
-        QuizQuestion(
-            image: "The Dark Knight",
-            correctAnswer: true
-        ),
-        QuizQuestion(
-            image: "Kill Bill",
-            correctAnswer: true
-        ),
-        QuizQuestion(
-            image: "The Avengers",
-            correctAnswer: true
-        ),
-        QuizQuestion(
-            image: "Deadpool",
-            correctAnswer: true
-        ),
-        QuizQuestion(
-            image: "The Green Knight",
-            correctAnswer: true
-        ),
-        QuizQuestion(
-            image: "Old",
-            correctAnswer: false
-        ),
-        QuizQuestion(
-            image: "The Ice Age Adventures of Buck Wild",
-            correctAnswer: false
-        ),
-        QuizQuestion(
-            image: "Tesla",
-            correctAnswer: false
-        ),
-        QuizQuestion(
-            image: "Vivarium",
-            correctAnswer: false
-        ),
-    ]
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        show(quiz: convert(model: questions[0]))
+        
+        questionFactory = QuestionFactory(delegate: self)
+        alertPresenter = AlertPresenter(delegate: self)
+        statisticService = StatisticServiceImplementation()
+        
+        questionFactory?.requestNextQuestion()
     }
     
-    @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        showAnswerResult(isCorrect: true == questions[currentQuestionIndex].correctAnswer)
-    }
-    @IBAction private func noButtonClicked(_ sender: UIButton) {
-        showAnswerResult(isCorrect: false == questions[currentQuestionIndex].correctAnswer)
-    }
+/*    func getMovie(from jsonString: String) -> Movie? {
+        let data = jsonString.data(using: .utf8)
+        guard let data = data else { return nil }
+        
+        var movie: Movie?
+        do {
+            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+            let actorList = json?["actorList"] as! [Any]
+            var actorListArray: [Actor] = []
+            for actor in actorList {
+                if let actor = actor as? [String: Any] {
+                    actorListArray.append(Actor(id: actor["id"] as? String ?? "",
+                                           image: actor["image"] as? String ?? "",
+                                           name: actor["name"] as? String ?? "",
+                                           asCharacter: actor["asCharacter"] as? String ?? ""))
+                }
+            }
+            movie = Movie(id: json?["id"] as? String ?? "",
+                          title: json?["title"] as? String ?? "",
+                          year: json?["year"] as? Int ?? 0,
+                          image: json?["image"] as? String ?? "",
+                          releaseDate: json?["releaseDate"] as? String ?? "",
+                          runtimeMins: json?["runtimeMins"] as? Int ?? 0,
+                          directors: json?["directors"] as? String ?? "",
+                          actorList: actorListArray)
+        } catch {
+            print("Faled to parse")
+        }
+        
+        return movie
+    }*/
+    
+    // MARK: - Private methods
+    
     // метод конвертации, который принимает моковый вопрос и возвращает вью модель для экрана вопроса
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
       return QuizStepViewModel(
         image: UIImage(named: model.image) ?? UIImage(),
         question: model.text,
-        questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)"
+        questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
       )
     }
     
@@ -114,24 +80,6 @@ final class MovieQuizViewController: UIViewController {
         imageView.image = step.image
         imageView.layer.borderColor = UIColor.clear.cgColor
         textLabel.text = step.question
-    }
-    
-    private func show(quiz result: QuizResultsViewModel) {
-        let alert = UIAlertController(
-            title: result.title,
-            message: result.text,
-            preferredStyle: .alert
-        )
-
-        let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            let firstQuestion = self.convert(model: self.questions[0])
-            self.show(quiz: firstQuestion)
-        }
-        
-        alert.addAction(action)
-        self.present(alert, animated: true, completion: nil)
     }
     
     // приватный метод, который меняет цвет рамки
@@ -148,7 +96,8 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
         view.isUserInteractionEnabled = false // выключает интерактивность
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
             self.showNextQuestionOrResults()
         }
     }
@@ -156,18 +105,59 @@ final class MovieQuizViewController: UIViewController {
     private func showNextQuestionOrResults() {
         view.isUserInteractionEnabled = true // включаем интерактивность
         
-        if currentQuestionIndex == questions.count - 1 {
-            let resultView = QuizResultsViewModel(
-                title: "Этот раунд окончен!",
-                text: "Ваш результат \(correctAnswers)/\(questions.count)",
-                buttonText: "Cыграть еще раз"
-            )
-            show(quiz: resultView)
+        if currentQuestionIndex == questionsAmount - 1 {
+            
+            var message = "Ваш результат \(correctAnswers)/\(questionsAmount)"
+            if let statisticService = statisticService {
+                statisticService.store(correct: correctAnswers, total: questionsAmount)
+                message += """
+                \nКоличество сыгранных квизов: \(statisticService.gamesCount)
+                Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
+                Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
+                """
+            }
+            
+            let alertModel = AlertModel(title: "Этот раунд окончен!",
+                                        message: message,
+                                        buttonText: "Cыграть еще раз") { [weak self] _ in
+                guard let self = self else { return }
+                self.currentQuestionIndex = 0
+                self.correctAnswers = 0
+                self.questionFactory?.requestNextQuestion()
+            }
+            alertPresenter?.show(alertModel)
+            
         } else {
             currentQuestionIndex += 1
             // идём в состояние "Вопрос показан"
-            let nextViewQuestion = convert(model: questions[currentQuestionIndex])
-            show(quiz: nextViewQuestion)
+            questionFactory?.requestNextQuestion()
         }
+    }
+    
+    // MARK: - Public QuestionFactoryDelegate
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
+            return
+        }
+        
+        currentQuestion = question
+        let viewModel = convert(model: question)
+        DispatchQueue.main.async { [weak self] in
+            self?.show(quiz: viewModel)
+        }
+    }
+    
+    // MARK: - IBActions
+    @IBAction private func yesButtonClicked(_ sender: UIButton) {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        showAnswerResult(isCorrect: true == currentQuestion.correctAnswer)
+    }
+    @IBAction private func noButtonClicked(_ sender: UIButton) {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        showAnswerResult(isCorrect: false == currentQuestion.correctAnswer)
     }
 }
