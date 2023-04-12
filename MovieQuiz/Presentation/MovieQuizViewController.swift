@@ -4,7 +4,7 @@ import Dispatch
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // MARK: Properties
-    let notificationGenerator = UINotificationFeedbackGenerator()
+    private let notificationGenerator = UINotificationFeedbackGenerator()
     // переменная с индексом текущего вопроса, начальное значение 0
     // (по этому индексу будем искать вопрос в массиве, где индекс первого элемента 0, а не 1)
     private var currentQuestionIndex = 0
