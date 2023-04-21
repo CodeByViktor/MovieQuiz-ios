@@ -19,6 +19,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet weak private var imageView: UIImageView!
     @IBOutlet weak private var textLabel: UILabel!
     @IBOutlet weak private var counterLabel: UILabel!
+    @IBOutlet weak private var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -132,6 +133,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             // идём в состояние "Вопрос показан"
             questionFactory?.requestNextQuestion()
         }
+    }
+    
+    // Show & Hide loadingIndicator
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+    }
+    private func hideLoadingIndicator() {
+        activityIndicator.stopAnimating()
+        activityIndicator.isHidden = true
     }
     
     // MARK: - Public QuestionFactoryDelegate
