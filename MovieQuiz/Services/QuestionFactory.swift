@@ -74,12 +74,42 @@ final class QuestionFactory: QuestionFactoryProtocol {
     }
     
     func requestNextQuestion() {
-        guard let index = (0..<questions.count).randomElement() else {
-            delegate?.didReceiveNextQuestion(question: nil)
-            return
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else { return }
+            let index = (0..<self.movies.count).randomElement() ?? 0
+            guard let movie = self.movies[safe: index] else { return }
+            var imageData = Data()
+            
+            do {
+                imageData = try Data(contentsOf: movie.imageURL)
+            } catch {
+                print("Failed to load image")
+            }
+            
+            let rating = Float(movie.rating) ?? 0
+            
+            let compareRating = Float((1...10).randomElement()!)
+            let compareStrings = ["больше", "меньше"]
+            var compareString = ""
+            if compareRating == 1 {
+                compareString = compareStrings[0]
+            } else if compareRating == 10 {
+                compareString = compareStrings[1]
+            } else {
+                compareString = compareStrings.randomElement()!
+            }
+            
+            let text = "Рейтинг этого фильма \(compareString) чем \(compareRating)?"
+            let correctAnswer = compareRating > rating
+            
+            let question = QuizQuestion(image: imageData,
+                                        text: text,
+                                        correctAnswer: correctAnswer)
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.didReceiveNextQuestion(question: question)
+            }
         }
-        
-        let question = questions[safe: index]
-        delegate?.didReceiveNextQuestion(question: question)
     }
 }
