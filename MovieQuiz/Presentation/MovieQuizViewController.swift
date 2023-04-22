@@ -81,6 +81,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         imageView.image = step.image
         imageView.layer.borderColor = UIColor.clear.cgColor
         textLabel.text = step.question
+        
+        view.isUserInteractionEnabled = true // включаем интерактивность
     }
     
     // приватный метод, который меняет цвет рамки
@@ -104,8 +106,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showNextQuestionOrResults() {
-        view.isUserInteractionEnabled = true // включаем интерактивность
-        
         if currentQuestionIndex == questionsAmount - 1 {
             
             var message = "Ваш результат \(correctAnswers)/\(questionsAmount)"
