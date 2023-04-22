@@ -8,11 +8,12 @@
 import Foundation
 
 final class QuestionFactory: QuestionFactoryProtocol {
-    
+    private let moviesLoader: MoviesLoading
     private weak var delegate: QuestionFactoryDelegate?
+    private var movies: [MostPopularMovie] = []
     
     // массив вопросов
-    private let questions: [QuizQuestion] = [
+/*    private let questions: [QuizQuestion] = [
         QuizQuestion(
             image: "The Godfather",
             correctAnswer: true
@@ -53,10 +54,23 @@ final class QuestionFactory: QuestionFactoryProtocol {
             image: "Vivarium",
             correctAnswer: false
         ),
-    ]
+    ]*/
     
-    init(delegate: QuestionFactoryDelegate) {
+    init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate?) {
+        self.moviesLoader = moviesLoader
         self.delegate = delegate
+    }
+    
+    func loadData() {
+        moviesLoader.loadMovies() { result in
+            switch result {
+            case .success(let movies):
+                self.movies = movies.items
+                self.delegate?.didLoadDataFromServer()
+            case .failure(let error):
+                self.delegate?.didFailToLoadData(with: error)
+            }
+        }
     }
     
     func requestNextQuestion() {
