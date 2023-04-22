@@ -23,12 +23,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        questionFactory = QuestionFactory(delegate: self)
+
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter = AlertPresenter(delegate: self)
         statisticService = StatisticServiceImplementation()
         
-        questionFactory?.requestNextQuestion()
+        showLoadingIndicator()
+        questionFactory?.loadData()
     }
     
 /*    func getMovie(from jsonString: String) -> Movie? {
@@ -140,6 +141,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                     message: message,
                                     buttonText: "Попробовать ещё раз") { [weak self] _ in
             guard let self = self else { return }
+            self.questionFactory?.loadData()
             
         }
         alertPresenter?.show(alertModel)

@@ -63,12 +63,14 @@ final class QuestionFactory: QuestionFactoryProtocol {
     
     func loadData() {
         moviesLoader.loadMovies() { result in
-            switch result {
-            case .success(let movies):
-                self.movies = movies.items
-                self.delegate?.didLoadDataFromServer()
-            case .failure(let error):
-                self.delegate?.didFailToLoadData(with: error)
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let movies):
+                    self.movies = movies.items
+                    self.delegate?.didLoadDataFromServer()
+                case .failure(let error):
+                    self.delegate?.didFailToLoadData(with: error)
+                }
             }
         }
     }
@@ -81,26 +83,38 @@ final class QuestionFactory: QuestionFactoryProtocol {
             var imageData = Data()
             
             do {
-                imageData = try Data(contentsOf: movie.imageURL)
+                imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
                 print("Failed to load image")
             }
             
             let rating = Float(movie.rating) ?? 0
             
+            enum Comparator: String, CaseIterable {
+                case more = "больше"
+                case less = "меньше"
+            }
             let compareRating = Float((1...10).randomElement()!)
-            let compareStrings = ["больше", "меньше"]
             var compareString = ""
+            var correctAnswer = false
             if compareRating == 1 {
-                compareString = compareStrings[0]
+                compareString = Comparator.more.rawValue
+                correctAnswer = rating > compareRating
             } else if compareRating == 10 {
-                compareString = compareStrings[1]
+                compareString = Comparator.less.rawValue
+                correctAnswer = rating < compareRating
             } else {
-                compareString = compareStrings.randomElement()!
+                let randomComparator = Comparator.allCases.randomElement()!
+                compareString = randomComparator.rawValue
+                switch randomComparator {
+                case .more:
+                    correctAnswer = rating > compareRating
+                case .less:
+                    correctAnswer = rating < compareRating
+                }
             }
             
             let text = "Рейтинг этого фильма \(compareString) чем \(compareRating)?"
-            let correctAnswer = compareRating > rating
             
             let question = QuizQuestion(image: imageData,
                                         text: text,
