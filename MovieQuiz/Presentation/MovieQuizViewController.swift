@@ -2,7 +2,6 @@ import UIKit
 import Dispatch
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
-    
     // MARK: Properties
     private let notificationGenerator = UINotificationFeedbackGenerator()
     // переменная с индексом текущего вопроса, начальное значение 0
@@ -137,12 +136,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showNetworkError(message: String) {
         hideLoadingIndicator()
-        
-        let alertModel = AlertModel(title: "Ошибка", message: message, buttonText: "Попробовать ещё раз") { [weak self] _ in
+        let alertModel = AlertModel(title: "Ошибка",
+                                    message: message,
+                                    buttonText: "Попробовать ещё раз") { [weak self] _ in
             guard let self = self else { return }
             
         }
-        
         alertPresenter?.show(alertModel)
     }
     
@@ -167,6 +166,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
+    }
+    func didLoadDataFromServer() {
+        hideLoadingIndicator()
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
     }
     
     // MARK: - IBActions
