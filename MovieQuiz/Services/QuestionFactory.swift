@@ -8,11 +8,12 @@
 import Foundation
 
 final class QuestionFactory: QuestionFactoryProtocol {
-    
+    private let moviesLoader: MoviesLoading
     private weak var delegate: QuestionFactoryDelegate?
+    private var movies: [MostPopularMovie] = []
     
     // массив вопросов
-    private let questions: [QuizQuestion] = [
+/*    private let questions: [QuizQuestion] = [
         QuizQuestion(
             image: "The Godfather",
             correctAnswer: true
@@ -53,19 +54,72 @@ final class QuestionFactory: QuestionFactoryProtocol {
             image: "Vivarium",
             correctAnswer: false
         ),
-    ]
+    ]*/
     
-    init(delegate: QuestionFactoryDelegate) {
+    init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate?) {
+        self.moviesLoader = moviesLoader
         self.delegate = delegate
     }
     
-    func requestNextQuestion() {
-        guard let index = (0..<questions.count).randomElement() else {
-            delegate?.didReceiveNextQuestion(question: nil)
-            return
+    func loadData() {
+        moviesLoader.loadMovies() { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let movies):
+                    self.movies = movies.items
+                    self.delegate?.didLoadDataFromServer()
+                case .failure(let error):
+                    self.delegate?.didFailToLoadData(with: error)
+                }
+            }
         }
-        
-        let question = questions[safe: index]
-        delegate?.didReceiveNextQuestion(question: question)
+    }
+    
+    func requestNextQuestion() {
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else { return }
+            let index = (0..<self.movies.count).randomElement() ?? 0
+            guard let movie = self.movies[safe: index] else { return }
+            var imageData = Data()
+            
+            do {
+                imageData = try Data(contentsOf: movie.resizedImageURL)
+            } catch {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.requestNextQuestion() // ??????
+                }
+                return
+            }
+            
+            let rating = Float(movie.rating) ?? 0
+            let compareRating = Float((6...10).randomElement()!)
+            var compareString = ""
+            var correctAnswer = false
+            if compareRating == 10 {
+                compareString = ComparationType.less.rawValue
+                correctAnswer = rating < compareRating
+            } else {
+                let randomComparator = ComparationType.allCases.randomElement()!
+                compareString = randomComparator.rawValue
+                switch randomComparator {
+                case .more:
+                    correctAnswer = rating > compareRating
+                case .less:
+                    correctAnswer = rating < compareRating
+                }
+            }
+            
+            let text = "Рейтинг этого фильма \(compareString) чем \(compareRating)?"
+            
+            let question = QuizQuestion(image: imageData,
+                                        text: text,
+                                        correctAnswer: correctAnswer)
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.didReceiveNextQuestion(question: question)
+            }
+        }
     }
 }

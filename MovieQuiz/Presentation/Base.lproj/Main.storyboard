@@ -45,7 +45,7 @@
                                             </label>
                                         </subviews>
                                     </stackView>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="73J-o2-gX0" userLabel="Preview Image">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="73J-o2-gX0" userLabel="Preview Image">
                                         <rect key="frame" x="0.0" y="43.5" width="374" height="561"/>
                                         <color key="backgroundColor" name="YP White"/>
                                         <constraints>
@@ -111,17 +111,23 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="we0-TC-buX">
+                                <rect key="frame" x="197" y="438" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
                             <constraint firstItem="gO2-fF-QZh" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="W1A-c1-d1l"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="gO2-fF-QZh" secondAttribute="bottom" id="YdO-AV-R13"/>
+                            <constraint firstItem="we0-TC-buX" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="bcK-hd-Lhg"/>
+                            <constraint firstItem="we0-TC-buX" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="epU-Ru-gMV"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="gO2-fF-QZh" secondAttribute="trailing" constant="20" id="fIN-33-jmQ"/>
                             <constraint firstItem="gO2-fF-QZh" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="gcY-mo-Lpg"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="we0-TC-buX" id="Vng-Bb-5zh"/>
                         <outlet property="counterLabel" destination="5Ij-NI-za9" id="ybF-uw-R9V"/>
                         <outlet property="imageView" destination="73J-o2-gX0" id="lRw-yr-2rf"/>
                         <outlet property="textLabel" destination="9bE-zX-yIY" id="FTL-eM-cz9"/>

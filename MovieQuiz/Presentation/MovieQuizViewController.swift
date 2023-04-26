@@ -2,7 +2,6 @@ import UIKit
 import Dispatch
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
-    
     // MARK: Properties
     private let notificationGenerator = UINotificationFeedbackGenerator()
     // переменная с индексом текущего вопроса, начальное значение 0
@@ -19,16 +18,18 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet weak private var imageView: UIImageView!
     @IBOutlet weak private var textLabel: UILabel!
     @IBOutlet weak private var counterLabel: UILabel!
+    @IBOutlet weak private var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        questionFactory = QuestionFactory(delegate: self)
+
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter = AlertPresenter(delegate: self)
         statisticService = StatisticServiceImplementation()
-        
-        questionFactory?.requestNextQuestion()
+
+        showLoadingIndicator()
+        questionFactory?.loadData()
     }
     
 /*    func getMovie(from jsonString: String) -> Movie? {
@@ -67,11 +68,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // метод конвертации, который принимает моковый вопрос и возвращает вью модель для экрана вопроса
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
-      return QuizStepViewModel(
-        image: UIImage(named: model.image) ?? UIImage(),
-        question: model.text,
-        questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
-      )
+        return QuizStepViewModel(
+            image: UIImage(data: model.image) ?? UIImage(),
+            question: model.text,
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
+        )
     }
     
     // приватный метод вывода на экран вопроса, который принимает на вход вью модель вопроса и ничего не возвращает
@@ -80,6 +81,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         imageView.image = step.image
         imageView.layer.borderColor = UIColor.clear.cgColor
         textLabel.text = step.question
+        
+        view.isUserInteractionEnabled = true // включаем интерактивность
     }
     
     // приватный метод, который меняет цвет рамки
@@ -103,8 +106,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showNextQuestionOrResults() {
-        view.isUserInteractionEnabled = true // включаем интерактивность
-        
         if currentQuestionIndex == questionsAmount - 1 {
             
             var message = "Ваш результат \(correctAnswers)/\(questionsAmount)"
@@ -134,6 +135,26 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    private func showNetworkError(message: String) {
+        hideLoadingIndicator()
+        let alertModel = AlertModel(title: "Ошибка",
+                                    message: message,
+                                    buttonText: "Попробовать ещё раз") { [weak self] _ in
+            guard let self = self else { return }
+            self.questionFactory?.loadData()
+            
+        }
+        alertPresenter?.show(alertModel)
+    }
+    
+    // Show & Hide loadingIndicator
+    private func showLoadingIndicator() {
+        activityIndicator.startAnimating()
+    }
+    private func hideLoadingIndicator() {
+        activityIndicator.stopAnimating()
+    }
+    
     // MARK: - Public QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
@@ -145,6 +166,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
+    }
+    func didLoadDataFromServer() {
+        hideLoadingIndicator()
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
     }
     
     // MARK: - IBActions
