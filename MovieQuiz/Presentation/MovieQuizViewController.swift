@@ -27,7 +27,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter = AlertPresenter(delegate: self)
         statisticService = StatisticServiceImplementation()
-        
+
         showLoadingIndicator()
         questionFactory?.loadData()
     }
@@ -149,12 +149,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // Show & Hide loadingIndicator
     private func showLoadingIndicator() {
-        activityIndicator.isHidden = false
         activityIndicator.startAnimating()
     }
     private func hideLoadingIndicator() {
         activityIndicator.stopAnimating()
-        activityIndicator.isHidden = true
     }
     
     // MARK: - Public QuestionFactoryDelegate

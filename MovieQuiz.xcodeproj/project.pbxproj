@@ -20,6 +20,7 @@
 		AB33FED129F2E78400F9BFBC /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB33FED029F2E78400F9BFBC /* NetworkClient.swift */; };
 		AB33FED329F2EE0900F9BFBC /* MostPopularMovies.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB33FED229F2EE0900F9BFBC /* MostPopularMovies.swift */; };
 		AB33FED529F2F3C500F9BFBC /* MoviesLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB33FED429F2F3C500F9BFBC /* MoviesLoader.swift */; };
+		ABF3EC4C29F962A300C26250 /* ComparationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF3EC4B29F962A300C26250 /* ComparationType.swift */; };
 		AD1ABAB22831907B00B3E448 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1ABAB12831907B00B3E448 /* AppDelegate.swift */; };
 		AD1ABAB42831907B00B3E448 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1ABAB32831907B00B3E448 /* SceneDelegate.swift */; };
 		AD1ABAB62831907B00B3E448 /* MovieQuizViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1ABAB52831907B00B3E448 /* MovieQuizViewController.swift */; };
@@ -45,6 +46,7 @@
 		AB33FED029F2E78400F9BFBC /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
 		AB33FED229F2EE0900F9BFBC /* MostPopularMovies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MostPopularMovies.swift; sourceTree = "<group>"; };
 		AB33FED429F2F3C500F9BFBC /* MoviesLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesLoader.swift; sourceTree = "<group>"; };
+		ABF3EC4B29F962A300C26250 /* ComparationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparationType.swift; sourceTree = "<group>"; };
 		AD1ABAAE2831907B00B3E448 /* MovieQuiz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MovieQuiz.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD1ABAB12831907B00B3E448 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AD1ABAB32831907B00B3E448 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -131,6 +133,14 @@
 			path = "YS Display";
 			sourceTree = "<group>";
 		};
+		ABF3EC4A29F9629200C26250 /* Enums */ = {
+			isa = PBXGroup;
+			children = (
+				ABF3EC4B29F962A300C26250 /* ComparationType.swift */,
+			);
+			path = Enums;
+			sourceTree = "<group>";
+		};
 		AD1ABAA52831907B00B3E448 = {
 			isa = PBXGroup;
 			children = (
@@ -150,6 +160,7 @@
 		AD1ABAB02831907B00B3E448 /* MovieQuiz */ = {
 			isa = PBXGroup;
 			children = (
+				ABF3EC4A29F9629200C26250 /* Enums */,
 				AB018F9629E1F7AB000770B0 /* Models */,
 				AB018F9329E1F354000770B0 /* Services */,
 				8F4738322848DE2A005DF65E /* Presentation */,
@@ -252,6 +263,7 @@
 				AD7AFA552836189F00399704 /* Array+Extensions.swift in Sources */,
 				AB018F9E29E205F8000770B0 /* QuestionFactoryProtocol.swift in Sources */,
 				AB018FA029E20DF3000770B0 /* QuestionFactoryDelegate.swift in Sources */,
+				ABF3EC4C29F962A300C26250 /* ComparationType.swift in Sources */,
 				AD1ABAB62831907B00B3E448 /* MovieQuizViewController.swift in Sources */,
 				AB018F9829E1F7C5000770B0 /* QuizStepViewModel.swift in Sources */,
 				AB018F9C29E1F7E7000770B0 /* QuizQuestion.swift in Sources */,
@@ -394,6 +406,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -440,7 +453,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = XFSK538AV7;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MovieQuiz/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -456,7 +469,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ru.yandex.practicum.MovieQuiz;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bva.practicum.MovieQuiz;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

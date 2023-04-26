@@ -85,26 +85,22 @@ final class QuestionFactory: QuestionFactoryProtocol {
             do {
                 imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
-                print("Failed to load image")
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.requestNextQuestion() // ??????
+                }
+                return
             }
             
             let rating = Float(movie.rating) ?? 0
-            
-            enum Comparator: String, CaseIterable {
-                case more = "больше"
-                case less = "меньше"
-            }
-            let compareRating = Float((1...10).randomElement()!)
+            let compareRating = Float((6...10).randomElement()!)
             var compareString = ""
             var correctAnswer = false
-            if compareRating == 1 {
-                compareString = Comparator.more.rawValue
-                correctAnswer = rating > compareRating
-            } else if compareRating == 10 {
-                compareString = Comparator.less.rawValue
+            if compareRating == 10 {
+                compareString = ComparationType.less.rawValue
                 correctAnswer = rating < compareRating
             } else {
-                let randomComparator = Comparator.allCases.randomElement()!
+                let randomComparator = ComparationType.allCases.randomElement()!
                 compareString = randomComparator.rawValue
                 switch randomComparator {
                 case .more:
