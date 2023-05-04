@@ -5,7 +5,6 @@
 //  Created by Виктор on 08.04.2023.
 //
 
-import Foundation
 import UIKit
 
 // вью модель для состояния "Вопрос показан"
