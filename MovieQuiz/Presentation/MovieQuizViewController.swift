@@ -1,7 +1,7 @@
 import UIKit
 import Dispatch
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     // MARK: Properties
     private var presenter: MovieQuizPresenter!
     private var alertPresenter: AlertPresenter!
@@ -14,11 +14,14 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         presenter = MovieQuizPresenter(viewController: self)
         alertPresenter = AlertPresenter(delegate: self)
     }
     
+    func setInteractionEnabled(_ val: Bool) {
+        view.isUserInteractionEnabled = val
+    }
     // приватный метод вывода на экран вопроса, который принимает на вход вью модель вопроса и ничего не возвращает
     func show(quiz step: QuizStepViewModel) {
         counterLabel.text = step.questionNumber
@@ -26,7 +29,7 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.borderColor = UIColor.clear.cgColor
         textLabel.text = step.question
         
-        view.isUserInteractionEnabled = true // включаем интерактивность
+        setInteractionEnabled(true) // включаем интерактивность
     }
     
     // приватный метод, который меняет цвет рамки
