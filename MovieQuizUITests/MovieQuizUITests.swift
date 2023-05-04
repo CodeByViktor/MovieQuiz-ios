@@ -54,5 +54,11 @@ final class MovieQuizUITests: XCTestCase {
         XCTAssertTrue(alert.exists)
         XCTAssertEqual(alert.label, "Этот раунд окончен!")
         XCTAssertEqual(alert.buttons.firstMatch.label, "Cыграть еще раз")
+        
+        alert.buttons.firstMatch.tap()
+        XCTAssertFalse(alert.exists)
+        sleep(2)
+        XCTAssertEqual(app.staticTexts["QuestionCounter"].label, "1/10")
+        
     }
 }
