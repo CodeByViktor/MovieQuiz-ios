@@ -54,14 +54,11 @@ final class MovieQuizUITests: XCTestCase {
         XCTAssertTrue(alert.exists)
         XCTAssertEqual(alert.label, "Этот раунд окончен!")
         XCTAssertEqual(alert.buttons.firstMatch.label, "Cыграть еще раз")
-    }
-
-    func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
-            }
-        }
+        
+        alert.buttons.firstMatch.tap()
+        XCTAssertFalse(alert.exists)
+        sleep(2)
+        XCTAssertEqual(app.staticTexts["QuestionCounter"].label, "1/10")
+        
     }
 }
